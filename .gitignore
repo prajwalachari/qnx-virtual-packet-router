@@ -1,0 +1,19 @@
+# Build artifacts
+obj/
+*.o
+*.exe
+
+# Binaries
+packet_router
+packet_router_qnx
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS junk
+.DS_Store
+Thumbs.db
