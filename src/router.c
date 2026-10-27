@@ -1,21 +1,5 @@
 /*
- * router.c
- * --------
- * Core simulation engine for the virtual packet router.
- *
- * This file implements:
- *  - Thread-safe packet queue (circular buffer with mutex + condvars)
- *  - Input port threads (simulate packet arrival using timers)
- *  - Output port threads (consume routed packets)
- *  - Statistics tracking and reporting
- *
- * The design mirrors how a real QNX-based network device would
- * separate ingress and egress processing into independent threads,
- * communicating through protected shared data structures.
- *
- * Author : Prajwal
- * Course : Real-Time Operating Systems (RTOS)
- * Project: Virtual Network Packet Router Simulation (QNX)
+ * router.c - packet queue, input/output port threads, stats
  */
 
 #include <stdio.h>
@@ -25,10 +9,7 @@
 #include <errno.h>
 #include "router.h"
 
-/* ================================================================
- *  PACKET QUEUE IMPLEMENTATION
- *  Circular buffer with blocking push/pop and timed waits.
- * ================================================================ */
+/* --- Packet Queue (circular buffer) --- */
 
 void packet_queue_init(PacketQueue *q)
 {
@@ -40,11 +21,7 @@ void packet_queue_init(PacketQueue *q)
     pthread_cond_init(&q->not_full, NULL);
 }
 
-/*
- * Push a packet into the queue.
- * Blocks for up to timeout_ms milliseconds if the queue is full.
- * Returns 0 on success, -1 on timeout or error.
- */
+/* Push a packet. Blocks up to timeout_ms if full. Returns 0 ok, -1 timeout. */
 int packet_queue_push(PacketQueue *q, Packet *pkt, int timeout_ms)
 {
     struct timespec deadline;
@@ -75,11 +52,7 @@ int packet_queue_push(PacketQueue *q, Packet *pkt, int timeout_ms)
     return 0;
 }
 
-/*
- * Pop a packet from the queue.
- * Blocks for up to timeout_ms milliseconds if the queue is empty.
- * Returns 0 on success, -1 on timeout.
- */
+/* Pop a packet. Blocks up to timeout_ms if empty. */
 int packet_queue_pop(PacketQueue *q, Packet *out, int timeout_ms)
 {
     struct timespec deadline;
@@ -116,9 +89,7 @@ void packet_queue_destroy(PacketQueue *q)
     pthread_cond_destroy(&q->not_full);
 }
 
-/* ================================================================
- *  ROUTER STATISTICS
- * ================================================================ */
+/* --- Stats --- */
 
 void router_stats_init(RouterStats *s)
 {
@@ -168,20 +139,9 @@ void router_stats_destroy(RouterStats *s)
     pthread_mutex_destroy(&s->lock);
 }
 
-/* ================================================================
- *  INPUT PORT THREAD
- *
- *  Each input port thread simulates a network interface receiving
- *  packets at variable intervals (mimicking real traffic bursts).
- *  It generates packets with random destination addresses, performs
- *  a routing table lookup to tag the correct output port, and
- *  pushes the packet into the central queue.
- * ================================================================ */
+/* --- Input Port Thread --- */
 
-/*
- * Generate a random destination IP that maps to one of our
- * four configured subnets (or occasionally an unroutable address).
- */
+/* pick a random dest IP — sometimes picks one with no matching route */
 static uint32_t random_dest_addr(void)
 {
     int choice = rand() % 5;
@@ -194,11 +154,7 @@ static uint32_t random_dest_addr(void)
     }
 }
 
-/*
- * Sleep for a random interval between 50ms and 300ms.
- * This simulates variable packet inter-arrival times,
- * which is more realistic than a fixed rate.
- */
+/* random delay to simulate bursty traffic */
 static void simulate_arrival_delay(void)
 {
     int delay_ms = 50 + (rand() % 250);
@@ -295,13 +251,7 @@ void *input_port_thread(void *arg)
     return NULL;
 }
 
-/* ================================================================
- *  OUTPUT PORT THREAD
- *
- *  Consumes packets from the central queue and "delivers" them.
- *  In a real system this would transmit out a physical interface;
- *  here we just log the routing decision and update stats.
- * ================================================================ */
+/* --- Output Port Thread --- */
 
 void *output_port_thread(void *arg)
 {

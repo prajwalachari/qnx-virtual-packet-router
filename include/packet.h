@@ -1,13 +1,5 @@
 /*
- * packet.h
- * --------
- * Data structures for network packet representation.
- * Each packet carries a unique ID, source/destination info,
- * a priority field, and a small payload buffer.
- *
- * Author : Prajwal
- * Course : Real-Time Operating Systems (RTOS)
- * Project: Virtual Network Packet Router Simulation (QNX)
+ * packet.h - network packet data structure
  */
 
 #ifndef PACKET_H

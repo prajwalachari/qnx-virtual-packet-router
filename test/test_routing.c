@@ -1,15 +1,8 @@
 /*
- * test_routing.c
- * --------------
- * Quick sanity check for the routing table module.
- * Verifies that lookups return the expected output port
- * for known destination addresses, and -1 for addresses
- * that don't match any entry.
+ * test_routing.c - basic tests for routing table lookups
  *
  * Build: gcc -Wall -I../include -o test_routing test_routing.c ../src/routing_table.c -lpthread
  * Run  : ./test_routing
- *
- * Author : Prajwal
  */
 
 #include <stdio.h>

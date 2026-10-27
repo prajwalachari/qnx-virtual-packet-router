@@ -1,12 +1,5 @@
 /*
- * routing_table.h
- * ---------------
- * Shared routing table protected by a mutex.
- * Maps destination address ranges to output ports.
- *
- * Author : Prajwal
- * Course : Real-Time Operating Systems (RTOS)
- * Project: Virtual Network Packet Router Simulation (QNX)
+ * routing_table.h - routing table interface
  */
 
 #ifndef ROUTING_TABLE_H

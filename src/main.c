@@ -1,27 +1,6 @@
 /*
- * main.c
- * ------
- * Entry point for the Virtual Network Packet Router simulation.
- *
- * This program demonstrates core RTOS concepts using QNX Neutrino:
- *   - Threads for concurrent input/output port processing
- *   - Mutex for safe access to the shared routing table
- *   - Message passing through a thread-safe queue
- *   - Timer-driven packet arrival simulation
- *
- * The router creates 4 input port threads and 4 output port threads.
- * Input ports generate packets with random destinations, look up
- * the routing table, and push them into a shared queue. Output ports
- * consume packets destined for their port number and log the result.
- *
- * Author : Prajwal
- * Course : Real-Time Operating Systems (RTOS)
- * Project: Virtual Network Packet Router Simulation (QNX)
- *
- * Build  : make          (Linux/POSIX)
- *          make qnx      (QNX target via qcc)
- *
- * Usage  : ./packet_router
+ * main.c - entry point for the packet router simulation
+ * Sets up routing table, spawns input/output threads, prints stats.
  */
 
 #include <stdio.h>
@@ -63,23 +42,23 @@ int main(int argc, char *argv[])
     printf("    RTOS Concepts: Threads, Mutex, Message Passing, Timers  \n");
     printf("============================================================\n\n");
 
-    /* ---- Step 1: Set up the routing table ---- */
+    /* set up routing table */
     RoutingTable routing_table;
     routing_table_init(&routing_table);
 
     printf("[Main] Routing table initialized with default routes:\n");
     routing_table_print(&routing_table);
 
-    /* ---- Step 2: Initialize the shared packet queue ---- */
+    /* init the shared queue */
     PacketQueue central_queue;
     packet_queue_init(&central_queue);
     printf("[Main] Packet queue initialized (capacity: %d)\n\n", PACKET_QUEUE_SIZE);
 
-    /* ---- Step 3: Initialize statistics tracker ---- */
+    /* stats */
     RouterStats stats;
     router_stats_init(&stats);
 
-    /* ---- Step 4: Spawn input port threads ---- */
+    /* spawn input port threads */
     pthread_t input_threads[MAX_PORTS];
     InputPortArgs input_args[MAX_PORTS];
 
@@ -103,7 +82,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    /* ---- Step 5: Spawn output port threads ---- */
+    /* spawn output port threads */
     pthread_t output_threads[MAX_PORTS];
     OutputPortArgs output_args[MAX_PORTS];
 
@@ -125,7 +104,7 @@ int main(int argc, char *argv[])
     printf("[Main] All threads running. Simulation in progress...\n");
     printf("       (Press Ctrl+C to stop early)\n\n");
 
-    /* ---- Step 6: Wait for all input threads to finish ---- */
+    /* wait for input threads to finish */
     for (int i = 0; i < MAX_PORTS; i++) {
         pthread_join(input_threads[i], NULL);
     }
@@ -143,10 +122,10 @@ int main(int argc, char *argv[])
         pthread_join(output_threads[i], NULL);
     }
 
-    /* ---- Step 7: Print final statistics ---- */
+    /* print final stats */
     router_stats_print(&stats);
 
-    /* ---- Cleanup ---- */
+    /* cleanup */
     packet_queue_destroy(&central_queue);
     routing_table_destroy(&routing_table);
     router_stats_destroy(&stats);

@@ -1,13 +1,5 @@
 /*
- * router.h
- * --------
- * Core router module declarations.
- * Manages input port threads, output port threads,
- * the central packet queue, and throughput statistics.
- *
- * Author : Prajwal
- * Course : Real-Time Operating Systems (RTOS)
- * Project: Virtual Network Packet Router Simulation (QNX)
+ * router.h - queue, stats, and thread declarations
  */
 
 #ifndef ROUTER_H

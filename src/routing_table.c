@@ -1,13 +1,5 @@
 /*
- * routing_table.c
- * ---------------
- * Implements the shared routing table with mutex-protected access.
- * Uses longest-prefix matching to resolve destination addresses
- * to output ports, similar to how a real router's FIB works.
- *
- * Author : Prajwal
- * Course : Real-Time Operating Systems (RTOS)
- * Project: Virtual Network Packet Router Simulation (QNX)
+ * routing_table.c - mutex-protected routing table with prefix matching
  */
 
 #include <stdio.h>
